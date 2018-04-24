@@ -8,3 +8,5 @@ Codes contains below data types:
 * string - String
 * dateTime.iso8601 - java.util.Date
 * For data type details: https://ws.apache.org/xmlrpc/types.html
+
+In addtion to above parts, I have added a class to get request and response as XML. And also there is a new function to print these XMLs pretty.
