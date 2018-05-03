@@ -33,8 +33,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-
-
 public class SendXMLRPC {
 	private String connectionURL = "";
 
@@ -105,13 +103,11 @@ public class SendXMLRPC {
 			client.setConfig(config);
 			generalInfoLogger("Config Settings Done");
 			MessageLoggingTransport loggingTransport = new MessageLoggingTransport(client);
-			final XmlRpcTransportFactory transportFactory = new XmlRpcTransportFactory()
-			{
-			    public XmlRpcTransport getTransport()
-			    {
+			final XmlRpcTransportFactory transportFactory = new XmlRpcTransportFactory() {
+				public XmlRpcTransport getTransport() {
 
-			        return loggingTransport;
-			    }
+					return loggingTransport;
+				}
 			};
 			responseMap = (Map<String, Object>) client.execute("method:name", check_params);
 
@@ -130,12 +126,12 @@ public class SendXMLRPC {
 				// DO SMT
 
 			}
-			
+
 			String request = loggingTransport.getRequest();
 			String response = loggingTransport.getResponse();
-			
+
 			generalInfoLogger("request" + prettyXML(request));
-			generalInfoLogger("response" +prettyXML(response));
+			generalInfoLogger("response" + prettyXML(response));
 
 			generalInfoLogger("responseMap:" + responseMap.toString());
 
@@ -151,45 +147,43 @@ public class SendXMLRPC {
 	private void generalInfoLogger(String log) {
 		System.out.println("LOG:" + log);
 	}
-	
-	
-	 private String prettyXML(String xml){
-	    	return prettyXML(xml, 1);
-	    }
-	    private String prettyXML(String xml, int indent){
-	    	try {
-	            // Turn xml string into a document
-	            Document document = DocumentBuilderFactory.newInstance()
-	                    .newDocumentBuilder()
-	                    .parse(new InputSource(new ByteArrayInputStream(xml.getBytes("utf-8"))));
 
-	            // Remove whitespaces outside tags
-	            document.normalize();
-	            XPath xPath = XPathFactory.newInstance().newXPath();
-	            NodeList nodeList = (NodeList) xPath.evaluate("//text()[normalize-space()='']",
-	                                                          document,
-	                                                          XPathConstants.NODESET);
+	private String prettyXML(String xml) {
+		return prettyXML(xml, 1);
+	}
 
-	            for (int i = 0; i < nodeList.getLength(); ++i) {
-	                Node node = nodeList.item(i);
-	                node.getParentNode().removeChild(node);
-	            }
+	private String prettyXML(String xml, int indent) {
+		try {
+			// Turn xml string into a document
+			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+					.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("utf-8"))));
 
-	            // Setup pretty print options
-	            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-	            transformerFactory.setAttribute("indent-number", indent);
-	            Transformer transformer = transformerFactory.newTransformer();
-	            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-	            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-	            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			// Remove whitespaces outside tags
+			document.normalize();
+			XPath xPath = XPathFactory.newInstance().newXPath();
+			NodeList nodeList = (NodeList) xPath.evaluate("//text()[normalize-space()='']", document,
+					XPathConstants.NODESET);
 
-	            // Return pretty print xml string
-	            StringWriter stringWriter = new StringWriter();
-	            transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
-	            return stringWriter.toString();
-	        } catch (Exception e) {
-	            throw new RuntimeException(e);
-	        }
-	    }
+			for (int i = 0; i < nodeList.getLength(); ++i) {
+				Node node = nodeList.item(i);
+				node.getParentNode().removeChild(node);
+			}
+
+			// Setup pretty print options
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", String.valueOf(indent));
+
+			// Return pretty print xml string
+			StringWriter stringWriter = new StringWriter();
+			transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
+			return stringWriter.toString();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 }
